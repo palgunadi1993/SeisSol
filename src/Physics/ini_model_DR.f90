@@ -232,6 +232,7 @@ MODULE ini_model_DR_mod
       if (EQN%FL == 103) then
         allocate( DISC%DynRup%RS_srW_array(DISC%Galerkin%nBndGP, MESH%Fault%nSide), &
                   DISC%DynRup%RS_sl0_array(DISC%Galerkin%nBndGP,MESH%Fault%nSide),  &
+                  DISC%DynRup%RS_sl0Nuc_array(DISC%Galerkin%nBndGP, MESH%Fault%nSide), &
                   nuc_xx(DISC%Galerkin%nBndGP,MESH%Fault%nSide),                    &
                   nuc_yy(DISC%Galerkin%nBndGP,MESH%Fault%nSide),                    &
                   nuc_zz(DISC%Galerkin%nBndGP,MESH%Fault%nSide),                    &
@@ -240,6 +241,7 @@ MODULE ini_model_DR_mod
                   nuc_xz(DISC%Galerkin%nBndGP,MESH%Fault%nSide)                     )
         call c_interoperability_addFaultParameter("rs_srW" // c_null_char, DISC%DynRup%RS_srW_array)
         call c_interoperability_addFaultParameter("RS_sl0" // c_null_char, DISC%DynRup%RS_sl0_array)
+        call c_interoperability_addFaultParameter("RS_sl0Nuc" // c_null_char, DISC%DynRup%RS_sl0Nuc_array)
         if (faultParameterizedByTraction) then
           call c_interoperability_addFaultParameter("Tnuc_n" // c_null_char, nuc_xx)
           call c_interoperability_addFaultParameter("Tnuc_s" // c_null_char, nuc_xy)
