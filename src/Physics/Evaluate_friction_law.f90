@@ -1223,7 +1223,7 @@ MODULE Eval_friction_law_mod
     REAL        :: SV0(nBndGP), tmp(nBndGP), tmp2(nBndGP), tmp3(nBndGP), SRtest(nBndGP), NR(nBndGP), dNR(nBndGP)
     REAL        :: LocSV(nBndGP)
     REAL        :: tmpSlip(nBndGP)
-    REAL        :: RS_f0,RS_a(nBndGP),RS_b,RS_sl0(nBndGP),RS_sr0
+    REAL        :: RS_f0,RS_a(nBndGP),RS_b,RS_sl0(nBndGP),RS_sl0Nuc(nBndGP),RS_sr0
     REAL        :: RS_fw,RS_srW(nBndGP),flv(nBndGP),fss(nBndGP),SVss(nBndGP)
     REAL        :: chi, tau, xi, eta, zeta, XGp, YGp, ZGp
     REAL        :: hypox, hypoy, hypoz
@@ -1280,6 +1280,9 @@ MODULE Eval_friction_law_mod
     EQN%InitialStressInFaultCS(:,4,iFace)=EQN%InitialStressInFaultCS(:,4,iFace)+EQN%NucleationStressInFaultCS(:,4,iFace)*Gnuc
     EQN%InitialStressInFaultCS(:,5,iFace)=EQN%InitialStressInFaultCS(:,5,iFace)+EQN%NucleationStressInFaultCS(:,5,iFace)*Gnuc
     EQN%InitialStressInFaultCS(:,6,iFace)=EQN%InitialStressInFaultCS(:,6,iFace)+EQN%NucleationStressInFaultCS(:,6,iFace)*Gnuc
+
+    !L nucleation
+    DISC%DynRup%RS_sl0_array(:,iFace) = DISC%DynRup%RS_sl0_array(:,iFace) - DISC%DynRup%RS_sl0Nuc_array(:,iFace)*Gnuc
 
     ENDIF ! Tnuc
     !
