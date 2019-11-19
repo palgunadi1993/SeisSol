@@ -1282,15 +1282,10 @@ MODULE Eval_friction_law_mod
     EQN%InitialStressInFaultCS(:,5,iFace)=EQN%InitialStressInFaultCS(:,5,iFace)+EQN%NucleationStressInFaultCS(:,5,iFace)*Gnuc
     EQN%InitialStressInFaultCS(:,6,iFace)=EQN%InitialStressInFaultCS(:,6,iFace)+EQN%NucleationStressInFaultCS(:,6,iFace)*Gnuc
 
-    !L nucleation
-    IF (time.LE.Tnuc) THEN
-        DISC%DynRup%RS_sl0_array(:,iFace) = DISC%DynRup%RS_sl0Nuc_array(:,iFace)
-    ELSE
-        DISC%DynRup%RS_sl0_array(:,iFace) = L0
-    ENDIF 
+    DISC%DynRup%RS_sl0_array(:,iFace) = DISC%DynRup%RS_sl0_array(:,iFace) - DISC%DynRup%RS_sl0Nuc_array(:,iFace)*Gnuc
 
     ENDIF ! Tnuc
-    !
+
      !
      LocSlip   = DISC%DynRup%Slip(:,iFace)
      LocSlip1   = DISC%DynRup%Slip1(:,iFace)
