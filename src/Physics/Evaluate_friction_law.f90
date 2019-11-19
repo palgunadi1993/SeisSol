@@ -1223,7 +1223,7 @@ MODULE Eval_friction_law_mod
     REAL        :: SV0(nBndGP), tmp(nBndGP), tmp2(nBndGP), tmp3(nBndGP), SRtest(nBndGP), NR(nBndGP), dNR(nBndGP)
     REAL        :: LocSV(nBndGP)
     REAL        :: tmpSlip(nBndGP)
-    REAL        :: RS_f0,RS_a(nBndGP),RS_b,RS_sl0(nBndGP),RS_sl0Nuc(nBndGP),RS_sr0
+    REAL        :: RS_f0,RS_a(nBndGP),RS_b,RS_sl0(nBndGP),RS_sl0Nuc(nBndGP),RS_sr0, L0(nBndGP)
     REAL        :: RS_fw,RS_srW(nBndGP),flv(nBndGP),fss(nBndGP),SVss(nBndGP)
     REAL        :: chi, tau, xi, eta, zeta, XGp, YGp, ZGp
     REAL        :: hypox, hypoy, hypoz
@@ -1246,6 +1246,7 @@ MODULE Eval_friction_law_mod
     !Apply time dependent nucleation at global time step not sub time steps for simplicity
     !initialize time and space dependent nucleation
     Tnuc = DISC%DynRup%t_0
+    L0 = DISC%DynRup%RS_sl0_array(:,iFace)
 
     !TU 7.07.16: if the SR is too close to zero, we will have problems (NaN)
     !as a consequence, the SR is affected the AlmostZero value when too small
@@ -1282,7 +1283,11 @@ MODULE Eval_friction_law_mod
     EQN%InitialStressInFaultCS(:,6,iFace)=EQN%InitialStressInFaultCS(:,6,iFace)+EQN%NucleationStressInFaultCS(:,6,iFace)*Gnuc
 
     !L nucleation
-    DISC%DynRup%RS_sl0_array(:,iFace) = DISC%DynRup%RS_sl0_array(:,iFace) - DISC%DynRup%RS_sl0Nuc_array(:,iFace)*Gnuc
+    IF (time.LE.Tnuc) THEN
+        DISC%DynRup%RS_sl0_array(:,iFace) = DISC%DynRup%RS_sl0Nuc_array(:,iFace)
+    ELSE
+        DISC%DynRup%RS_sl0_array(:,iFace) = L0
+    ENDIF 
 
     ENDIF ! Tnuc
     !
