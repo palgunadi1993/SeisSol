@@ -1227,7 +1227,7 @@ MODULE Eval_friction_law_mod
     REAL        :: RS_fw,RS_srW(nBndGP),flv(nBndGP),fss(nBndGP),SVss(nBndGP)
     REAL        :: chi, tau, xi, eta, zeta, XGp, YGp, ZGp
     REAL        :: hypox, hypoy, hypoz
-    REAL        :: Rnuc, Tnuc, radius, Gnuc, invZ, AlmostZero, aTolF
+    REAL        :: Rnuc, Tnuc, radius, Gnuc, invZ, AlmostZero, aTolF, maxlocsliprate
     REAL        :: prevtime,dt
     LOGICAL     :: has_converged
     LOGICAL     :: nodewise=.FALSE.
@@ -1246,7 +1246,6 @@ MODULE Eval_friction_law_mod
     !Apply time dependent nucleation at global time step not sub time steps for simplicity
     !initialize time and space dependent nucleation
     Tnuc = DISC%DynRup%t_0
-    L0 = DISC%DynRup%RS_sl0_array(:,iFace)
 
     !TU 7.07.16: if the SR is too close to zero, we will have problems (NaN)
     !as a consequence, the SR is affected the AlmostZero value when too small
@@ -1266,12 +1265,15 @@ MODULE Eval_friction_law_mod
     IF (time.LE.Tnuc) THEN
     IF (time.GT.0.0D0) THEN
         Gnuc=EXP((time-Tnuc)**2/(time*(time-2.0D0*Tnuc)))
+        L0 = EXP((time-Tnuc)**2/(time*(time-3.0D0*Tnuc)))
         prevtime = time - dt
         IF (prevtime.GT.0.0D0) THEN
         Gnuc= Gnuc - EXP((prevtime-Tnuc)**2/(prevtime*(prevtime-2.0D0*Tnuc)))
+        L0 = EXP((prevtime-Tnuc)**2/(prevtime*(prevtime-3.0D0*Tnuc)))
         ENDIF
     ELSE
         Gnuc=0.0D0
+        L0 = Gnuc
     ENDIF
 
     !DISC%DynRup%NucBulk_** is already in fault coordinate system
@@ -1282,7 +1284,7 @@ MODULE Eval_friction_law_mod
     EQN%InitialStressInFaultCS(:,5,iFace)=EQN%InitialStressInFaultCS(:,5,iFace)+EQN%NucleationStressInFaultCS(:,5,iFace)*Gnuc
     EQN%InitialStressInFaultCS(:,6,iFace)=EQN%InitialStressInFaultCS(:,6,iFace)+EQN%NucleationStressInFaultCS(:,6,iFace)*Gnuc
 
-    DISC%DynRup%RS_sl0_array(:,iFace) = DISC%DynRup%RS_sl0_array(:,iFace) - DISC%DynRup%RS_sl0Nuc_array(:,iFace)*Gnuc
+    DISC%DynRup%RS_sl0_array(:,iFace) = DISC%DynRup%RS_sl0_array(:,iFace) + DISC%DynRup%RS_sl0Nuc_array(:,iFace)*L0
 
     ENDIF ! Tnuc
 
